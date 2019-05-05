@@ -35,7 +35,7 @@ module.exports = {
       {text: 'Issues', link: 'https://github.com/wencaizhang/underscore-analysis/issues'},
     ],
     sidebar: [
-
+      './_.memoize'
     ]
   },
 }
