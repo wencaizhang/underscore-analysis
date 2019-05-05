@@ -1,0 +1,23 @@
+{
+  "name": "underscore-analysis",
+  "version": "1.0.0",
+  "description": "underscore源码学习",
+  "main": "index.js",
+  "scripts": {
+    "dev": "vuepress dev docs",
+    "build": "vuepress build docs"
+  },
+  "repository": {
+    "type": "git",
+    "url": "git+https://github.com/wencaizhang/underscore-analysis.git"
+  },
+  "author": "wencaizhang",
+  "license": "ISC",
+  "bugs": {
+    "url": "https://github.com/wencaizhang/underscore-analysis/issues"
+  },
+  "homepage": "https://github.com/wencaizhang/underscore-analysis#readme",
+  "devDependencies": {
+    "vuepress": "^0.14.8"
+  }
+}
