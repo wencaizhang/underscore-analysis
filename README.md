@@ -3,14 +3,17 @@
 
 [源码地址](https://github.com/jashkenas/underscore/blob/master/underscore.js)
 
-</Block>
+<img src="https://underscorejs.net/img/underscore.png" alt="underscorejs" style="
+    width: 70%;
+">
 
+</Block>
 
 <Block>
 
-## 作用域包裹
+## 立即执行函数
 
-与其他第三方库一样，underscore 也通过**立即执行函数**来包裹自己的代码。
+与其他第三方库一样，underscore 最外层是一个**立即执行函数**。
 
 这样做有两个好处：
 
@@ -19,55 +22,57 @@
 
 立即执行函数调用时，形参 `global` 和 `factory` 分别对应实参 `this` 和 `underscore` 的主体代码函数。
 
-而在立即执行函数内部，通过嵌套的三元表达式依次按照 CMD、AMD 和原生 JS 的写法向外暴露 underscore。
 
-如果感觉嵌套的三元表达式的写法看起来复杂，就改为 `if...else...` 的形式，如下：
+<Example>
 
 ```js
+(function (global, factory) {
+  // ...
+}(this, (function () {
+  // 主体代码
+})))
+```
+
+</Example>
+
+</Block>
+
+
+<Block>
+
+## 立即执行函数内部
+
+### 嵌套的三元表达式
+
+在立即执行函数内部，通过嵌套的三元表达式依次按照 CMD、AMD 和原生 JS 的写法向外暴露 underscore。
+
+嵌套的三元表达式的写法看起来很复杂，我们可以改为 `if...else...` 的形式，如下：
+
+```js
+// 如果是 CMD 环境，按照 CMD 规范向外暴露函数
 if (typeof exports === 'object' && typeof module !== 'undefined') {
-  // 如果是 CMD 环境，按照 CommonJS 规范向外暴露函数
   module.exports = factory()
+
+// 如果是 AMD 环境，按照 AMD 规范向外暴露
 } else if (typeof define === 'function' && define.amd) {
-  // 如果是 AMD 环境，按照 AMD 规范向外暴露
   define('underscore', factory)
+
 } else {
   // 既不是 CMD 也不是 AMD，将 underscore 挂载到全局对象上
   // 这部分代码下面进一步解释
 }
 ```
 
-当既不是 CMD 也不是 AMD 环境，将 underscore 挂载到全局对象上时，这里分成了两步，第一步确定 `global` 的值：
-
-
-```js
-(global = global || self, (
-  // 立即执行函数向外暴露 underscore
-));
-```
-
-第二步才是获取 underscore
-
-```js
-// 立即执行函数向外暴露 underscore
-function () {
-  var current = global._;
-  var exports = global._ = factory();
-  exports.noConflict = function () { global._ = current; return exports; };
-}()
-```
-
 
 <Example>
 
 ```js
-// global 接收下面通过 this 传入的值
-// factory 接收一个 function，function 内部是实现 underscore 具体代码
 (function (global, factory) {
-  // 如果是 CMD 环境，按照 CommonJS 规范向外暴露函数
+
   typeof exports === 'object' && typeof module !== 'undefined' ? module.exports = factory() :
-  // 如果是 AMD 环境，按照 AMD 规范向外暴露
+
   typeof define === 'function' && define.amd ? define('underscore', factory) :
-  // 既不是 CMD 也不是 AMD，将 underscore 挂载到全局对象上
+
   (global = global || self, (function () {
     var current = global._;
     var exports = global._ = factory();
@@ -84,14 +89,63 @@ function () {
 
 <Block>
 
-## _ 是一个对象
+## 如何挂载到全局对象上
 
-`_` 是一个函数对象，所有的 api 都会被挂载到这个对象上，如 `_.each`，`_.map` 等。
+<Example>
 
-## _ 也是一个函数
+```js
+(global = global || self, (function () {
+  var current = global._;
+  var exports = global._ = factory();
+  exports.noConflict = function () { global._ = current; return exports; };
+}()));
+```
 
-但同时，`_` 也是一个函数，用 `_(obj)` 的形式来创建 underscore 的实例 instance，instance 享有和 `_` 相同的函数。
+</Example>
 
+这部分代码写的也很有技巧性，这部分代码分成赋值语句和匿名函数自执行两部分，中间是逗号隔开，结构如下：
+
+```
+(赋值语句, 匿名函数自执行)
+```
+
+赋值语句实际上是要再次确定全局变量的值：
+
+```js
+global = global || self
+```
+
+再来看匿名函数自执行：
+
+```js
+function () {
+  var current = global._;
+  var exports = global._ = factory();
+  exports.noConflict = function () { global._ = current; return exports; };
+}()
+```
+
+一句一句地来解释。
+
+首先将全局对象 `global` 的 `_` **原属性值** 赋值给变量 `current`
+
+接着通过工厂函数 `factory()` 来获取 underscore 实例，并将其连续赋值给 `global` 的 `_` 属性和变量 `export`。
+
+最后给 `exports` 绑定了一个 `noConflict` 函数，这是用于处理命名冲突的问题。
+
+</Block>
+<Block>
+
+
+<Block>
+
+## _ 既是一个对象，也是一个函数
+
+首先 _ 是一个对象，所有的工具方法我们都需要通过对象属性的方式来调用，如 `_.each`，`_.map` 等。
+
+但同时，`_` 也是一个函数，用 `_(obj)` 的形式来创建 underscore 的实例对象，实例对象享有和 `_` 相同的函数属性。
+
+这一点和 jQuery 十分相似。
 
 <Example>
 
@@ -141,5 +195,3 @@ function mixin(obj) {
 </Example>
 
 </Block>
-
-
