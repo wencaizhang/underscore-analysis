@@ -29,7 +29,7 @@
 (function (global, factory) {
   // ...
 }(this, (function () {
-  // 主体代码
+  // underscore 主体代码
 })))
 ```
 
@@ -63,7 +63,6 @@ if (typeof exports === 'object' && typeof module !== 'undefined') {
 }
 ```
 
-
 <Example>
 
 ```js
@@ -79,7 +78,7 @@ if (typeof exports === 'object' && typeof module !== 'undefined') {
     exports.noConflict = function () { global._ = current; return exports; };
   }()));
 }(this, (function () {
-  // 主体代码
+  // underscore 主体代码
 })))
 ```
 
@@ -134,7 +133,6 @@ function () {
 最后给 `exports` 绑定了一个 `noConflict` 函数，这是用于处理命名冲突的问题。
 
 </Block>
-<Block>
 
 
 <Block>
